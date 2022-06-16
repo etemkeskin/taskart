@@ -84,8 +84,8 @@ class AccountController extends Controller
             $response['status'] = true;
 
             return response()->json($response, 200)
-            ->header('api_key' ,$account->api_key )
-            ->header('api_secret' , $account->api_secret);
+            ->header('api-key' ,$account->api_key )
+            ->header('api-secret' , $account->api_secret);
             
 
         }catch(\Exception $e){

@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Validator;
 use App\Models\Account;
 use Illuminate\Support\Str;
+use App\Http\Services\JsonResponseHandler;
 
 class AccountController extends Controller
 {
@@ -21,18 +22,13 @@ class AccountController extends Controller
             'phone' => 'required'
         ]);
 
-        $response = [
-            'status' => false,
-            'error' => null,
-            'errorType' => null,
-            'data' => null
-        ];
+        $json_response_handler = new JsonResponseHandler();
 
         if($validator->fails()){
 
-            $response['error'] = $validator->errors()->first();
-            $response['errorType'] = 'required';
-            return $response;
+            $json_response_handler->setError($validator->errors()->first());
+            $json_response_handler->setErrorType('required');
+            return  $json_response_handler->getJsonResponse();
         }
 
         try{
@@ -43,13 +39,13 @@ class AccountController extends Controller
             $account->save();
         }catch(\Exception $e){
             \Log::error('Error when registering new account : ' . $e->getMessage());
-            $response['status'] = false;
-            $response['error'] = 'An error occured';
-            return $response;
+            $json_response_handler->setStatus(false);
+            $json_response_handler->setError('An error occured');
+            return $json_response_handler->getJsonResponse();
         }
-        $response['status'] = true;
-        $response['message'] = 'Account created';
-        return response()->json($response, 201);
+        $json_response_handler->setStatus(true);
+        $json_response_handler->setMessage('Account created');
+        return response()->json($json_response_handler->getJsonResponse(), 201);
     }
 
 

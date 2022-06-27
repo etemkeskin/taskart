@@ -20,7 +20,6 @@ use App\Http\Controllers\ProductController;
 Route::post('/register', [AccountController::class, 'register']);
 Route::post('/login', [AccountController::class, 'login']);
 
-
 Route::post('/products', [ProductController::class, 'create']);
 
 

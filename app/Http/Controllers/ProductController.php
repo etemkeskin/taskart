@@ -2,15 +2,18 @@
 
 namespace App\Http\Controllers;
 
+
 use Illuminate\Http\Request;
 use Validator;
 use App\Models\Product;
 use App\Models\Account;
+use App\Http\Services\JsonResponseHandler;
 
 class ProductController extends Controller
 {
     public function create(Request $request){
 
+        $json_response_handler = new JsonResponseHandler();
         $params = $request->all();
 
         $validator = Validator::make($params['product'], [
@@ -19,18 +22,11 @@ class ProductController extends Controller
             'price' => 'required'
         ]);
 
-        $response = [
-            'status' => false,
-            'error' => null,
-            'errorType' => null,
-            'data' => null
-        ];
-
         if($validator->fails()){
 
-            $response['error'] = $validator->errors()->first();
-            $response['errorType'] = 'required';
-            return $response;
+            $json_response_handler->setError($validator->errors()->first());
+            $json_response_handler->setErrorType('required');
+            return $json_response_handler->getJsonResponse();
         }
 
         $api_key = $request->header('api-key');
@@ -38,8 +34,8 @@ class ProductController extends Controller
         $account = Account::where('api_key', $api_key)->first();
 
         if ($account == null ) {
-            $response['error'] = 'Kullanıcı bulunamadı.';
-            $response['errorType'] = 'notfound';
+            $json_response_handler->setError( 'Kullanıcı bulunamadı.');
+            $json_response_handler->setErrorType('notfound');
             return $response;
         }
           
